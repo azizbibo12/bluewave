@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>Blue-Wave مباشر</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body{margin:0;font-family:Arial;background:#0e0e0e;color:#fff;text-align:center}
+    header{background:#1f1f1f;padding:10px;font-size:1.2em}
+    #tv-container{height:65vh;width:100%}
+    #controls{padding:15px}
+    button{padding:10px 20px;border:none;border-radius:4px;background:#4caf50;color:#fff;font-size:1em;cursor:pointer}
+    #status{margin-top:10px;font-size:0.9em;color:#4caf50}
+    nav a{color:#4caf50;margin:0 8px;text-decoration:none;font-weight:bold}
+  </style>
+</head>
+<body>
+  <header>📈 Blue-Wave مباشر | BTC</header>
+  <nav>
+    <a href="?page=settings">⚙️ الإعدادات</a>
+    <a href="?page=history">📊 السجل</a>
+  </nav>
+
+  <div id="controls">
+    <button id="copyBtn">📋 نسخ الأوامر</button>
+    <div id="status"></div>
+  </div>
+
+  <!-- شارت TradingView -->
+  <div id="tv-container"></div>
+
+  <script src="https://s3.tradingview.com/tv.js"></script>
+  <script>
+    // استرجاع الإعدادات
+    const settings = JSON.parse(localStorage.getItem('bwSettings')) || {};
+    const symbol = settings.symbol || 'BINANCE:BTCUSDT.P';
+
+    // متغيرات الإشارة
+    let lastDir = 'LONG', lastEntry = 28500, lastSL = 28200, lastTP = 29100;
+
+    // ربط الشارت
+    new TradingView.widget({
+      container_id: "tv-container",
+      symbol: symbol,
+      interval: "5",
+      theme: "dark",
+      locale: "ar",
+      toolbar_bg: "#1f1f1f",
+      enable_publishing: false,
+      studies: ["BlueWave@tv-basicstudies"],
+      withdateranges: true,
+      show_popup_button: true,
+      no_referral_id: true
+    });
+
+    // نسخ الأوامر
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      const text = `الاتجاه: ${lastDir}\nالدخول: $${lastEntry}\nSL: $${lastSL}\nTP: $${lastTP}`;
+      navigator.clipboard.writeText(text).then(() => {
+        document.getElementById('status').innerText = '✅ تم النسخ!';
+        setTimeout(() => document.getElementById('status').innerText = '', 2000);
+      });
+    });
+
+    // محاكاة إشارة (يمكن استبدالها بـWebhook لاحقاً)
+    setTimeout(() => {
+      lastDir   = Math.random() > 0.5 ? 'LONG' : 'SHORT';
+      lastEntry = Math.round(Math.random() * 1000 + 28000);
+      lastSL    = lastEntry - 300;
+      lastTP    = lastEntry + 900;
+      document.getElementById('status').innerText = `إشارة جديدة: ${lastDir}`;
+    }, 4000);
+  </script>
+</body>
+</html>
