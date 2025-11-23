@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>الإعدادات</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body{margin:0;font-family:Arial;background:#0e0e1e;color:#fff;text-align:center}
+    header{background:#1f1f1f;padding:10px;font-size:1.2em}
+    form{padding:20px;max-width:400px;margin:auto}
+    label{display:block;margin-top:10px;font-weight:bold}
+    input{margin-top:5px;padding:8px;border:1px solid #555;background:#1f1f1f;color:#fff;border-radius:4px;width:100%}
+    button{margin-top:15px;padding:10px 20px;border:none;border-radius:4px;background:#4caf50;color:#fff;font-size:1em;cursor:pointer}
+    #saveStatus{margin-top:10px;font-size:0.9em;color:#4caf50}
+    nav a{color:#4caf50;margin:0 8px;text-decoration:none;font-weight:bold}
+  </style>
+</head>
+<body>
+  <header>⚙️ الإعدادات</header>
+  <nav>
+    <a href="index.html">📈 الشارت</a>
+    <a href="history.html">📊 السجل</a>
+  </nav>
+
+  <form id="settingsForm">
+    <label>رمز التداول:
+      <input type="text" id="symbol" value="BINANCE:BTCUSDT.P" />
+    </label>
+    <label>جلسة التداول:
+      <input type="text" id="session" value="09:30-11:30" />
+    </label>
+    <label>نسبة المخاطرة %:
+      <input type="number" id="risk" value="1" min="0.1" max="10" step="0.1" />
+    </label>
+    <button type="submit">💾 حفظ</button>
+    <div id="saveStatus"></div>
+  </form>
+
+  <script>
+    const form = document.getElementById('settingsForm');
+    const status = document.getElementById('saveStatus');
+
+    // ملء الحقول المحفوظة
+    window.onload = () => {
+      const s = JSON.parse(localStorage.getItem('bwSettings')) || {};
+      document.getElementById('symbol').value  = s.symbol || 'BINANCE:BTCUSDT.P';
+      document.getElementById('session').value = s.session || '09:30-11:30';
+      document.getElementById('risk').value    = s.risk || 1;
+    };
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const settings = {
+        symbol: document.getElementById('symbol').value.trim(),
+        session: document.getElementById('session').value.trim(),
+        risk: parseFloat(document.getElementById('risk').value)
+      };
+      localStorage.setItem('bwSettings', JSON.stringify(settings));
+      status.innerText = '✅ تم الحفظ!';
+      setTimeout(() => status.innerText = '', 2000);
+    });
+  </script>
+</body>
+</html>
