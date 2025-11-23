@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>سجل الصفقات</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body{margin:0;font-family:Arial;background:#0e0e1e;color:#fff;text-align:center}
+    header{background:#1f1f1f;padding:10px;font-size:1.2em}
+    #controls{padding:15px}
+    button{padding:10px 15px;border:none;border-radius:4px;margin:5px;cursor:pointer}
+    #exportBtn{background:#2196F3} #clearBtn{background:#f44336}
+    table{width:100%;border-collapse:collapse;margin-top:15px;font-size:0.9em}
+    th,td{padding:8px;border:1px solid #333}
+    th{background:#1f1f1f}
+    nav a{color:#4caf50;margin:0 8px;text-decoration:none;font-weight:bold}
+  </style>
+</head>
+<body>
+  <header>📊 سجل الصفقات</header>
+  <nav>
+    <a href="index.html">📈 الشارت</a>
+    <a href="settings.html">⚙️ الإعدادات</a>
+  </nav>
+
+  <div id="controls">
+    <button id="exportBtn">📥 تصدير CSV</button>
+    <button id="clearBtn">🗑️ مسح الكل</button>
+  </div>
+
+  <table id="tradeTable">
+    <thead>
+      <tr>
+        <th>التاريخ/الوقت</th>
+        <th>الاتجاه</th>
+        <th>الدخول</th>
+        <th>SL</th>
+        <th>TP</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const tbody = document.querySelector('#tradeTable tbody');
+    const exportBtn = document.getElementById('exportBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    function loadTable() {
+      const history = JSON.parse(localStorage.getItem('bwHistory')) || [];
+      tbody.innerHTML = '';
+      history.forEach(trade => {
+        const row = tbody.insertRow();
+        row.insertCell(0).innerText = trade.time;
+        row.insertCell(1).innerText = trade.dir;
+        row.insertCell(2).innerText = `$${trade.entry.toFixed(2)}`;
+        row.insertCell(3).innerText = `$${trade.sl.toFixed(2)}`;
+        row.insertCell(4).innerText = `$${trade.tp.toFixed(2)}`;
+      });
+    }
+
+    exportBtn.addEventListener('click', () => {
+      const history = JSON.parse(localStorage.getItem('bwHistory')) || [];
+      const csv = 'Time,Direction,Entry,SL,TP\n' +
+        history.map(h => `${h.time},${h.dir},${h.entry},${h.sl},${h.tp}`).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'BlueWave_History.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    clearBtn.addEventListener('click', () => {
+      if (confirm('⚠️ مسح السجل بالكامل؟')) {
+        localStorage.removeItem('bwHistory');
+        loadTable();
+      }
+    });
+
+    window.onload = loadTable;
+  </script>
+</body>
+</html>
